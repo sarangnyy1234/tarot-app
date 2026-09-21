@@ -52,8 +52,8 @@ const suits=[
 const ranks=[["에이스","Ace","시작"],["2","Two","균형"],["3","Three","확장"],["4","Four","기반"],["5","Five","도전"],["6","Six","회복"],["7","Seven","점검"],["8","Eight","진전"],["9","Nine","성숙"],["10","Ten","완성"],["페이지","Page","소식"],["나이트","Knight","추진"],["퀸","Queen","수용"],["킹","King","통솔"]];
 let deck=majors.map((x,i)=>({ko:x[0],en:x[1],icon:x[2],key:x[3],advice:x[4],group:"메이저 아르카나"}));
 suits.forEach(s=>ranks.forEach(r=>deck.push({ko:s[0]+" "+r[0],en:r[1]+" of "+s[1],icon:s[2],key:s[3]+" · "+r[2],advice:r[2]+"의 에너지를 "+s[0]+" 영역에서 균형 있게 활용하세요.",group:s[0]})));
-const tabs=[["daily","오늘의 운세"],["weekly","주간 운세"],["yearly","연간 운세"],["total","총 운세"],["gallery","카드 도감"],["saved","마이 타로"]];
-let mode="daily", reverse=true;
+const tabs=[["choose","직접 카드 선택"],["daily","오늘의 운세"],["weekly","주간 운세"],["yearly","연간 운세"],["total","총 운세"],["gallery","카드 도감"],["saved","마이 타로"]];
+let mode="choose", reverse=true; let selected=[];
 const $=s=>document.querySelector(s), shuffle=a=>[...a].sort(()=>Math.random()-.5);
 function nav(){ $("#tabs").innerHTML=tabs.map(t=>'<button class="'+(mode===t[0]?'active':'')+'" onclick="mode=\''+t[0]+'\';render()">'+t[1]+'</button>').join("")}
 function pick(n){return shuffle(deck).slice(0,n).map(c=>({...c,rev:reverse&&Math.random()<.28}))}
@@ -63,7 +63,29 @@ function details(cs){return '<div class="reading">'+cs.map((c,i)=>'<article><h3>
 function save(cs,type){localStorage.setItem("tarotLast",JSON.stringify({date:new Date().toLocaleString("ko-KR"),type,cards:cs}));alert("마이 타로에 저장했어요 ✨")}
 function draw(n,labels,type){const cs=pick(n);$("#result").innerHTML='<div class="cards">'+cs.map((c,i)=>card(c,labels[i]||"")).join("")+'</div>'+details(cs)+'<div class="controls"><button onclick=\'save(window.lastCards,"'+type+'")\'>💜 결과 저장</button></div>';window.lastCards=cs}
 function standard(title,desc,n,labels){$("#title").textContent=title;$("#desc").textContent=desc;$("#app").innerHTML='<div class="controls"><button class="primary" onclick=\'draw('+n+','+JSON.stringify(labels)+',"'+title+'")\'>🔮 카드 뽑기</button><label class="pill"><input type="checkbox" '+(reverse?'checked':'')+' onchange="reverse=this.checked"> 역방향 포함</label></div><div id="result"><p style="text-align:center" class="muted">마음을 가다듬고 카드 뽑기를 눌러주세요.</p></div>'}
+
+function chooseCard(i){
+ const c=deck[i], found=selected.findIndex(x=>x.i===i);
+ if(found>=0){selected.splice(found,1)}else{
+   if(selected.length>=5){alert("한 번에 최대 5장까지 선택할 수 있어요.");return}
+   selected.push({i:i,rev:reverse&&Math.random()<.28});
+ }
+ renderChoose();
+}
+function renderChoose(){
+ $("#title").textContent="78장 중 직접 카드 선택";
+ $("#desc").textContent="참가자가 마음이 가는 카드를 직접 선택하세요. 최대 5장까지 선택할 수 있습니다.";
+ $("#app").innerHTML='<div class="controls"><span class="pill">선택 '+selected.length+' / 5</span><label class="pill"><input type="checkbox" '+(reverse?'checked':'')+' onchange="reverse=this.checked"> 역방향 포함</label><button onclick="selected=[];renderChoose()">↺ 다시 선택</button><button class="primary" '+(selected.length?'':'disabled')+' onclick="revealSelected()">✨ 선택한 카드 해석</button></div><div class="gallery">'+deck.map((c,i)=>'<div class="mini" style="'+(selected.some(x=>x.i===i)?'outline:3px solid #d25cff;transform:translateY(-4px)':'')+'" onclick="chooseCard('+i+')"><div class="ico">🌌</div><b>타로 카드 '+String(i+1).padStart(2,"0")+'</b><br><small>'+(selected.some(x=>x.i===i)?'✓ 선택됨':'카드를 선택하세요')+'</small></div>').join("")+'</div><p class="muted" style="text-align:center;margin-top:18px">카드의 정체는 선택 후 공개됩니다.</p>';
+}
+function revealSelected(){
+ if(!selected.length)return;
+ const cs=selected.map(x=>({...deck[x.i],rev:x.rev}));
+ $("#app").innerHTML='<div class="controls"><button onclick="renderChoose()">← 카드 선택으로</button><button class="primary" onclick=\'save(window.lastCards,"직접 선택 리딩")\'>💜 결과 저장</button></div><div class="cards">'+cs.map((c,i)=>card(c,(i+1)+"번째 선택")).join("")+'</div>'+details(cs);
+ window.lastCards=cs;
+}
+
 function render(){nav();
+if(mode==="choose"){renderChoose();return;}
 if(mode==="daily")standard("오늘의 운세","현재의 흐름 · 기회 · 오늘의 조언을 세 장으로 읽습니다.",3,["현재의 흐름","오늘의 기회","오늘의 조언"]);
 if(mode==="weekly")standard("주간 운세","이번 주의 시작 · 중심 · 마무리 흐름을 살펴봅니다.",3,["주초","주중","주말"]);
 if(mode==="total")standard("총 운세","전체 · 연애 · 금전 · 직장/학업 · 대인관계의 흐름을 살펴봅니다.",5,["전체운","연애운","금전운","직장/학업운","대인관계운"]);
