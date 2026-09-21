@@ -72,4 +72,5 @@ if(mode==="gallery"){$("#title").textContent="78장 카드 도감";$("#desc").te
 if(mode==="saved"){$("#title").textContent="마이 타로";$("#desc").textContent="최근 저장한 리딩을 다시 확인합니다.";let s=localStorage.getItem("tarotLast");$("#app").innerHTML=s?(()=>{let x=JSON.parse(s);return '<h3>'+x.type+' <span class="muted">'+x.date+'</span></h3><div class="cards">'+x.cards.map(c=>card(c)).join("")+'</div>'+details(x.cards)})():'<p style="text-align:center">아직 저장한 리딩이 없습니다.</p>'}}
 function year(){let cs=pick(12),ms=["1월","2월","3월","4월","5월","6월","7월","8월","9월","10월","11월","12월"];$("#result").innerHTML='<div class="months">'+cs.map((c,i)=>'<div class="mini"><b>'+ms[i]+'</b><div class="ico">'+c.icon+'</div>'+c.ko+'<br><small>'+c.key+'</small></div>').join("")+'</div>'+details(cs);window.lastCards=cs}
 render();
-</script></body></html>
+</script><!-- 사랑타로 배포 갱신: 2026-09-21 -->
+</body></html>
