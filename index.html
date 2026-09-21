@@ -34,6 +34,15 @@ footer{text-align:center;padding:30px 18px;opacity:.6;font-size:12px}@media(max-
  .choice-card img,.mini img{border-radius:4px!important;margin-bottom:2px!important}
  .controls{gap:5px;margin:10px 0}.controls button,.controls .pill{padding:8px 10px;font-size:11px}
 }
+
+.cardback{width:100%;aspect-ratio:350/600;border-radius:7px;position:relative;overflow:hidden;background:
+radial-gradient(circle at center,#e7c9ff 0 3%,transparent 3.5%),
+repeating-conic-gradient(from 45deg at center,#a55cff 0 8deg,#351552 8deg 16deg);
+border:2px solid #d7b4ff;box-shadow:inset 0 0 0 3px #351552,inset 0 0 0 5px #d7b4ff}
+.cardback:before{content:"✦";position:absolute;inset:10%;display:flex;align-items:center;justify-content:center;border:1px solid #efdfff;border-radius:50%;font-size:clamp(12px,4vw,34px);color:#fff;text-shadow:0 0 12px #fff}
+.cardback:after{content:"☾ ✧ ☽";position:absolute;left:0;right:0;bottom:12%;text-align:center;font-size:clamp(7px,2vw,15px);color:#f4eaff}
+.choice-card.selected .cardback{outline:3px solid #fff;box-shadow:0 0 16px #d25cff}
+@media(max-width:600px){.cardback{border-width:1px}.cardback:before{inset:12%;font-size:15px}.cardback:after{font-size:7px}}
 </style></head><body>
 <header><div class="brand">✦ 사랑타로 ✦</div><div class="sub">카드가 건네는 상징을 통해 오늘의 마음을 들여다보세요</div></header>
 <nav id="tabs"></nav><main><section class="hero"><h1 id="title">오늘의 운세</h1><p id="desc">세 장의 카드로 오늘의 흐름과 조언을 살펴봅니다.</p></section><section class="panel" id="app"></section></main>
@@ -89,11 +98,11 @@ function standard(title,desc,n,labels){$("#title").textContent=title;$("#desc").
 
 let readingState={};
 const configs={
- choose:{title:"직접 카드 선택",desc:"78장의 실제 카드를 보고 마음이 가는 카드를 직접 선택하세요.",count:5,labels:["첫 번째 카드","두 번째 카드","세 번째 카드","네 번째 카드","다섯 번째 카드"]},
- daily:{title:"오늘의 운세",desc:"78장 중 3장을 직접 선택해 오늘의 흐름을 읽습니다.",count:3,labels:["현재의 흐름","오늘의 기회","오늘의 조언"]},
- weekly:{title:"주간 운세",desc:"78장 중 3장을 직접 선택해 이번 주의 흐름을 읽습니다.",count:3,labels:["주초","주중","주말"]},
- yearly:{title:"연간 운세",desc:"78장 중 12장을 직접 선택해 1월부터 12월까지의 흐름을 읽습니다.",count:12,labels:["1월","2월","3월","4월","5월","6월","7월","8월","9월","10월","11월","12월"]},
- total:{title:"총 운세",desc:"78장 중 5장을 직접 선택해 주요 영역을 한꺼번에 읽습니다.",count:5,labels:["전체운","연애운","금전운","직장/학업운","대인관계운"]}
+ choose:{title:"직접 카드 선택",desc:"78장의 뒷면 카드 중 마음이 가는 카드를 직접 선택하세요. 선택을 마치면 카드가 공개됩니다.",count:5,labels:["첫 번째 카드","두 번째 카드","세 번째 카드","네 번째 카드","다섯 번째 카드"]},
+ daily:{title:"오늘의 운세",desc:"뒷면으로 놓인 78장 중 3장을 직접 선택하세요. 선택 후 카드가 공개되고 오늘의 흐름을 함께 해석합니다.",count:3,labels:["현재의 흐름","오늘의 기회","오늘의 조언"]},
+ weekly:{title:"주간 운세",desc:"뒷면으로 놓인 78장 중 3장을 직접 선택하세요. 선택 후 카드가 공개되고 이번 주의 흐름을 함께 해석합니다.",count:3,labels:["주초","주중","주말"]},
+ yearly:{title:"연간 운세",desc:"뒷면으로 놓인 78장 중 12장을 직접 선택하세요. 선택 후 카드가 공개되고 12개월의 흐름을 함께 해석합니다.",count:12,labels:["1월","2월","3월","4월","5월","6월","7월","8월","9월","10월","11월","12월"]},
+ total:{title:"총 운세",desc:"뒷면으로 놓인 78장 중 5장을 직접 선택하세요. 선택 후 카드가 공개되고 주요 운세를 함께 해석합니다.",count:5,labels:["전체운","연애운","금전운","직장/학업운","대인관계운"]}
 };
 function stateFor(m){if(!readingState[m])readingState[m]=[];return readingState[m]}
 function togglePick(i){
@@ -105,7 +114,7 @@ function renderPicker(){
  const cfg=configs[mode],arr=stateFor(mode);
  $("#title").textContent=cfg.title;$("#desc").textContent=cfg.desc;
  $("#app").innerHTML='<div class="controls"><span class="pill">선택 '+arr.length+' / '+cfg.count+'</span><label class="pill"><input type="checkbox" '+(reverse?'checked':'')+' onchange="reverse=this.checked"> 역방향 포함</label><button onclick="readingState[mode]=[];renderPicker()">↺ 다시 선택</button><button class="primary" '+(arr.length===cfg.count?'':'disabled')+' onclick="interpretPicked()">✨ '+cfg.count+'장 함께 해석</button></div>'+
- '<div class="choice-grid">'+deck.map((x,i)=>'<div class="choice-card '+(arr.includes(i)?'selected':'')+'" onclick="togglePick('+i+')"><img src="'+x.img+'" alt="'+x.ko+'" loading="lazy"><b>'+x.ko+'</b><small>'+(arr.includes(i)?'✓ '+(arr.indexOf(i)+1)+'번째':'선택')+'</small></div>').join("")+'</div>';
+ '<div class="choice-grid">'+deck.map((x,i)=>'<div class="choice-card '+(arr.includes(i)?'selected':'')+'" onclick="togglePick('+i+')"><div class="cardback" aria-label="뒤집힌 타로 카드"></div><b>카드 '+String(i+1).padStart(2,"0")+'</b><small>'+(arr.includes(i)?'✓ '+(arr.indexOf(i)+1)+'번째 선택':'선택하기')+'</small></div>').join("")+'</div>';
 }
 function interpretPicked(){
  const cfg=configs[mode],arr=stateFor(mode); if(arr.length!==cfg.count)return;
