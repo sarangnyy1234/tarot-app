@@ -9,7 +9,7 @@ button,.pill{border:1px solid #b88cff55;background:#ffffff10;color:#fff;border-r
 main{max-width:1120px;margin:auto;padding:20px}.hero{text-align:center;padding:22px}.hero h1{margin:0 0 8px;font-size:clamp(26px,5vw,44px)}
 .panel{background:#ffffff0c;border:1px solid #ffffff1f;border-radius:22px;padding:20px;box-shadow:0 18px 50px #0005}.controls{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin:18px 0}
 .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:16px}.card{perspective:900px}.face{min-height:310px;border-radius:18px;padding:16px;border:1px solid #e9d5ff55;background:linear-gradient(155deg,#351c54,#171025);box-shadow:0 12px 28px #0007;display:flex;flex-direction:column;align-items:center;justify-content:space-between;text-align:center}
-.symbol{font-size:76px;filter:drop-shadow(0 0 18px #d9a7ff88)}.name{font-size:19px;font-weight:800}.en{font-size:12px;opacity:.65}.rev{transform:rotate(180deg)}.tag{font-size:12px;padding:5px 9px;border-radius:999px;background:#ffffff15}
+.symbol{font-size:76px;filter:drop-shadow(0 0 18px #d9a7ff88)}.tarotimg{width:100%;max-width:210px;aspect-ratio:350/600;object-fit:cover;border-radius:10px;box-shadow:0 8px 24px #0008}.mini img{width:100%;aspect-ratio:350/600;object-fit:cover;border-radius:9px;margin-bottom:8px}.name{font-size:19px;font-weight:800}.en{font-size:12px;opacity:.65}.rev{transform:rotate(180deg)}.tag{font-size:12px;padding:5px 9px;border-radius:999px;background:#ffffff15}
 .reading{margin-top:18px;display:grid;gap:12px}.reading article{background:#ffffff0a;border-radius:15px;padding:15px;border-left:3px solid #b777ff}.reading h3{margin:0 0 8px}
 .gallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(135px,1fr));gap:10px}.mini{padding:13px;border-radius:14px;background:#ffffff0b;border:1px solid #ffffff17;text-align:center;cursor:pointer}.mini .ico{font-size:35px}.mini small{opacity:.65}
 .months{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px}.muted{opacity:.68;font-size:13px}.hidden{display:none!important}
@@ -50,15 +50,17 @@ const suits=[
 ["펜타클","Pentacles","🪙","현실·자원·안정"]
 ];
 const ranks=[["에이스","Ace","시작"],["2","Two","균형"],["3","Three","확장"],["4","Four","기반"],["5","Five","도전"],["6","Six","회복"],["7","Seven","점검"],["8","Eight","진전"],["9","Nine","성숙"],["10","Ten","완성"],["페이지","Page","소식"],["나이트","Knight","추진"],["퀸","Queen","수용"],["킹","King","통솔"]];
-let deck=majors.map((x,i)=>({ko:x[0],en:x[1],icon:x[2],key:x[3],advice:x[4],group:"메이저 아르카나"}));
-suits.forEach(s=>ranks.forEach(r=>deck.push({ko:s[0]+" "+r[0],en:r[1]+" of "+s[1],icon:s[2],key:s[3]+" · "+r[2],advice:r[2]+"의 에너지를 "+s[0]+" 영역에서 균형 있게 활용하세요.",group:s[0]})));
+const IMG="https://petaloverflow.github.io/tarot-api/cards/";
+const courtCodes=["ac","02","03","04","05","06","07","08","09","10","pa","kn","qu","ki"];
+let deck=majors.map((x,i)=>({ko:x[0],en:x[1],icon:x[2],key:x[3],advice:x[4],group:"메이저 아르카나",img:IMG+"ar"+String(i).padStart(2,"0")+".jpg"}));
+suits.forEach((s,si)=>ranks.forEach((r,ri)=>{const p=["wa","cu","sw","pe"][si];deck.push({ko:s[0]+" "+r[0],en:r[1]+" of "+s[1],icon:s[2],key:s[3]+" · "+r[2],advice:r[2]+"의 에너지를 "+s[0]+" 영역에서 균형 있게 활용하세요.",group:s[0],img:IMG+p+courtCodes[ri]+".jpg"})}));
 const tabs=[["choose","직접 카드 선택"],["daily","오늘의 운세"],["weekly","주간 운세"],["yearly","연간 운세"],["total","총 운세"],["gallery","카드 도감"],["saved","마이 타로"]];
 let mode="choose", reverse=true; let selected=[];
 const $=s=>document.querySelector(s), shuffle=a=>[...a].sort(()=>Math.random()-.5);
 function nav(){ $("#tabs").innerHTML=tabs.map(t=>'<button class="'+(mode===t[0]?'active':'')+'" onclick="mode=\''+t[0]+'\';render()">'+t[1]+'</button>').join("")}
 function pick(n){return shuffle(deck).slice(0,n).map(c=>({...c,rev:reverse&&Math.random()<.28}))}
 function meaning(c){return c.rev?"정방향의 에너지가 지연되거나 내면화되는 시기입니다. "+c.advice:c.key+"의 흐름이 강조됩니다. "+c.advice}
-function card(c,label=""){return '<div class="card"><div class="face '+(c.rev?'rev':'')+'"><span class="tag">'+(label||c.group)+'</span><div class="symbol">'+c.icon+'</div><div><div class="name">'+c.ko+'</div><div class="en">'+c.en+'</div></div><span class="tag">'+(c.rev?'역방향':'정방향')+'</span></div></div>'}
+function card(c,label=""){return '<div class="card"><div class="face"><span class="tag">'+(label||c.group)+'</span><img class="tarotimg '+(c.rev?'rev':'')+'" src="'+c.img+'" alt="'+c.ko+'" loading="lazy"><div><div class="name">'+c.ko+'</div><div class="en">'+c.en+'</div></div><span class="tag">'+(c.rev?'역방향':'정방향')+'</span></div></div>'}
 function details(cs){return '<div class="reading">'+cs.map((c,i)=>'<article><h3>'+c.icon+' '+c.ko+' · '+(c.rev?'역방향':'정방향')+'</h3><b>의미</b> '+c.key+'<br><br><b>해석</b> '+meaning(c)+'<br><br><b>좋은 점</b> '+(c.rev?'숨은 문제를 인식하고 조정할 기회가 생깁니다.':'카드의 강점을 적극적으로 활용하기 좋은 흐름입니다.')+'<br><br><b>보완할 점</b> '+c.advice+'</article>').join("")+'</div>'}
 function save(cs,type){localStorage.setItem("tarotLast",JSON.stringify({date:new Date().toLocaleString("ko-KR"),type,cards:cs}));alert("마이 타로에 저장했어요 ✨")}
 function draw(n,labels,type){const cs=pick(n);$("#result").innerHTML='<div class="cards">'+cs.map((c,i)=>card(c,labels[i]||"")).join("")+'</div>'+details(cs)+'<div class="controls"><button onclick=\'save(window.lastCards,"'+type+'")\'>💜 결과 저장</button></div>';window.lastCards=cs}
@@ -75,7 +77,7 @@ function chooseCard(i){
 function renderChoose(){
  $("#title").textContent="78장 중 직접 카드 선택";
  $("#desc").textContent="참가자가 마음이 가는 카드를 직접 선택하세요. 최대 5장까지 선택할 수 있습니다.";
- $("#app").innerHTML='<div class="controls"><span class="pill">선택 '+selected.length+' / 5</span><label class="pill"><input type="checkbox" '+(reverse?'checked':'')+' onchange="reverse=this.checked"> 역방향 포함</label><button onclick="selected=[];renderChoose()">↺ 다시 선택</button><button class="primary" '+(selected.length?'':'disabled')+' onclick="revealSelected()">✨ 선택한 카드 해석</button></div><div class="gallery">'+deck.map((c,i)=>'<div class="mini" style="'+(selected.some(x=>x.i===i)?'outline:3px solid #d25cff;transform:translateY(-4px)':'')+'" onclick="chooseCard('+i+')"><div class="ico">🌌</div><b>타로 카드 '+String(i+1).padStart(2,"0")+'</b><br><small>'+(selected.some(x=>x.i===i)?'✓ 선택됨':'카드를 선택하세요')+'</small></div>').join("")+'</div><p class="muted" style="text-align:center;margin-top:18px">카드의 정체는 선택 후 공개됩니다.</p>';
+ $("#app").innerHTML='<div class="controls"><span class="pill">선택 '+selected.length+' / 5</span><label class="pill"><input type="checkbox" '+(reverse?'checked':'')+' onchange="reverse=this.checked"> 역방향 포함</label><button onclick="selected=[];renderChoose()">↺ 다시 선택</button><button class="primary" '+(selected.length?'':'disabled')+' onclick="revealSelected()">✨ 선택한 카드 해석</button></div><div class="gallery">'+deck.map((c,i)=>'<div class="mini" style="'+(selected.some(x=>x.i===i)?'outline:3px solid #d25cff;transform:translateY(-4px)':'')+'" onclick="chooseCard('+i+')"><div class="ico">🌌</div><b>타로 카드 '+String(i+1).padStart(2,"0")+'</b><br><small>'+(selected.some(x=>x.i===i)?'✓ 선택됨':'카드를 선택하세요')+'</small></div>').join("")+'</div><p class="muted" style="text-align:center;margin-top:18px">78장의 라이더-웨이트-스미스 카드 이미지를 모두 보고 원하는 카드를 직접 선택할 수 있습니다.</p>';
 }
 function revealSelected(){
  if(!selected.length)return;
