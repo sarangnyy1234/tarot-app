@@ -11,7 +11,7 @@ main{max-width:1120px;margin:auto;padding:20px}.hero{text-align:center;padding:2
 .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:16px}.card{perspective:900px}.face{min-height:310px;border-radius:18px;padding:16px;border:1px solid #e9d5ff55;background:linear-gradient(155deg,#351c54,#171025);box-shadow:0 12px 28px #0007;display:flex;flex-direction:column;align-items:center;justify-content:space-between;text-align:center}
 .symbol{font-size:76px;filter:drop-shadow(0 0 18px #d9a7ff88)}.tarotimg{width:100%;max-width:210px;aspect-ratio:350/600;object-fit:cover;border-radius:10px;box-shadow:0 8px 24px #0008}.mini img{width:100%;aspect-ratio:350/600;object-fit:cover;border-radius:9px;margin-bottom:8px}.name{font-size:19px;font-weight:800}.en{font-size:12px;opacity:.65}.rev{transform:rotate(180deg)}.tag{font-size:12px;padding:5px 9px;border-radius:999px;background:#ffffff15}
 .reading{margin-top:18px;display:grid;gap:12px}.reading article{background:#ffffff0a;border-radius:15px;padding:15px;border-left:3px solid #b777ff}.reading h3{margin:0 0 8px}
-.gallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(135px,1fr));gap:10px}.mini{padding:13px;border-radius:14px;background:#ffffff0b;border:1px solid #ffffff17;text-align:center;cursor:pointer}.mini .ico{font-size:35px}.mini small{opacity:.65}
+.gallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(145px,1fr));gap:10px}.mini{padding:13px;border-radius:14px;background:#ffffff0b;border:1px solid #ffffff17;text-align:center;cursor:pointer}.mini .ico{font-size:35px}.mini small{opacity:.65}
 .months{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px}.muted{opacity:.68;font-size:13px}.hidden{display:none!important}
 footer{text-align:center;padding:30px 18px;opacity:.6;font-size:12px}@media(max-width:600px){nav{justify-content:flex-start}.face{min-height:270px}}
 </style></head><body>
@@ -50,7 +50,7 @@ const suits=[
 ["펜타클","Pentacles","🪙","현실·자원·안정"]
 ];
 const ranks=[["에이스","Ace","시작"],["2","Two","균형"],["3","Three","확장"],["4","Four","기반"],["5","Five","도전"],["6","Six","회복"],["7","Seven","점검"],["8","Eight","진전"],["9","Nine","성숙"],["10","Ten","완성"],["페이지","Page","소식"],["나이트","Knight","추진"],["퀸","Queen","수용"],["킹","King","통솔"]];
-const IMG="https://petaloverflow.github.io/tarot-api/cards/";
+const IMG="https://raw.githubusercontent.com/sixseeds/tarot-api/main/cards/";
 const courtCodes=["ac","02","03","04","05","06","07","08","09","10","pa","kn","qu","ki"];
 let deck=majors.map((x,i)=>({ko:x[0],en:x[1],icon:x[2],key:x[3],advice:x[4],group:"메이저 아르카나",img:IMG+"ar"+String(i).padStart(2,"0")+".jpg"}));
 suits.forEach((s,si)=>ranks.forEach((r,ri)=>{const p=["wa","cu","sw","pe"][si];deck.push({ko:s[0]+" "+r[0],en:r[1]+" of "+s[1],icon:s[2],key:s[3]+" · "+r[2],advice:r[2]+"의 에너지를 "+s[0]+" 영역에서 균형 있게 활용하세요.",group:s[0],img:IMG+p+courtCodes[ri]+".jpg"})}));
@@ -76,7 +76,7 @@ function chooseCard(i){
 }
 function renderChoose(){
  $("#title").textContent="78장 중 직접 카드 선택";
- $("#desc").textContent="참가자가 마음이 가는 카드를 직접 선택하세요. 최대 5장까지 선택할 수 있습니다.";
+ $("#desc").textContent="라이더-웨이트-스미스 실제 카드 78장을 모두 펼쳐 놓았습니다. 참가자가 그림을 직접 보고 마음이 가는 카드를 최대 5장까지 선택하세요.";
  $("#app").innerHTML='<div class="controls"><span class="pill">선택 '+selected.length+' / 5</span><label class="pill"><input type="checkbox" '+(reverse?'checked':'')+' onchange="reverse=this.checked"> 역방향 포함</label><button onclick="selected=[];renderChoose()">↺ 다시 선택</button><button class="primary" '+(selected.length?'':'disabled')+' onclick="revealSelected()">✨ 선택한 카드 해석</button></div><div class="gallery">'+deck.map((c,i)=>'<div class="mini" style="'+(selected.some(x=>x.i===i)?'outline:3px solid #d25cff;transform:translateY(-4px)':'')+'" onclick="chooseCard('+i+')"><div class="ico">🌌</div><b>타로 카드 '+String(i+1).padStart(2,"0")+'</b><br><small>'+(selected.some(x=>x.i===i)?'✓ 선택됨':'카드를 선택하세요')+'</small></div>').join("")+'</div><p class="muted" style="text-align:center;margin-top:18px">78장의 라이더-웨이트-스미스 카드 이미지를 모두 보고 원하는 카드를 직접 선택할 수 있습니다.</p>';
 }
 function revealSelected(){
