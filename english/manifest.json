@@ -1,0 +1,8 @@
+{
+  "name": "TripTalk English",
+  "short_name": "TripTalk",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#f7f5ff",
+  "theme_color": "#6046df"
+}
